@@ -2,11 +2,20 @@ import * as SQLite from "expo-sqlite"
 
 let db: SQLite.SQLiteDatabase;
 
+
+export async function getDB() {
+  if (!db) {
+    db = await SQLite.openDatabaseAsync("miBD.db");
+  }
+  return db;
+}
+
+
 export async function initDB() {
   
-  db = await SQLite.openDatabaseAsync("miBD.db")
+   const database = await getDB();
 
-  await db.execAsync(`
+  await database.execAsync(`
        CREATE TABLE IF NOT EXISTS listaActividadesPrincipales (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         cod_lote TEXT,
@@ -29,7 +38,8 @@ export async function initDB() {
 
 
 export async function hayDatosLocales(){
-  const result = await db.getAllAsync<{total:number}>('SELECt COUNT(*) as total FROM   listaActividadesPrincipales');
+   const database = await getDB();
+  const result = await database.getAllAsync<{total:number}>('SELECt COUNT(*) as total FROM   listaActividadesPrincipales');
   console.log(result[0].total)
    return result[0].total > 0;
    
